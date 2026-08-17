@@ -14,7 +14,7 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      // Simple validation - in production use proper auth
+      // Simple validation
       if (username === 'admin' && password === 'roofing2026!') {
         localStorage.setItem('adminAuth', 'true');
         navigate('/admin');
