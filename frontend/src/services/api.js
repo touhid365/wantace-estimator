@@ -1,15 +1,10 @@
-// Use environment variable with fallback
+// Make sure this points to the correct API endpoint
 const API_URL = import.meta.env.VITE_API_URL || 'https://wantace-estimator-txka.onrender.com/api';
 
-// Helper to get auth header
-const getAuthHeader = () => {
-  const credentials = btoa('admin:roofing2026!');
-  return `Basic ${credentials}`;
-};
-
-// Public endpoints
+// Public endpoints - all should include /api prefix
 export const getConfig = async () => {
   try {
+    // ✅ Correct: /api/config
     const response = await fetch(`${API_URL}/config`, {
       method: 'GET',
       headers: {
@@ -19,8 +14,7 @@ export const getConfig = async () => {
     });
     
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     return response.json();
@@ -32,6 +26,7 @@ export const getConfig = async () => {
 
 export const submitEstimate = async (data) => {
   try {
+    // ✅ Correct: /api/estimate
     const response = await fetch(`${API_URL}/estimate`, {
       method: 'POST',
       headers: {
@@ -53,9 +48,9 @@ export const submitEstimate = async (data) => {
   }
 };
 
-// Admin endpoints (protected)
 export const getLeads = async () => {
   try {
+    // ✅ Correct: /api/admin/leads
     const response = await fetch(`${API_URL}/admin/leads`, {
       headers: {
         'Authorization': getAuthHeader(),
@@ -77,6 +72,7 @@ export const getLeads = async () => {
 
 export const updateConfig = async (config) => {
   try {
+    // ✅ Correct: /api/admin/config
     const response = await fetch(`${API_URL}/admin/config`, {
       method: 'PUT',
       headers: {
@@ -97,4 +93,10 @@ export const updateConfig = async (config) => {
     console.error('updateConfig error:', error);
     throw error;
   }
+};
+
+// Helper function for auth header
+const getAuthHeader = () => {
+  const credentials = btoa('admin:roofing2026!');
+  return `Basic ${credentials}`;
 };
