@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { Config } from '../models/Config.js';
-import { Lead } from '../models/Lead.js';
+import { Config } from '../models/Config.js';  // ✅ Add .js extension
+import { Lead } from '../models/Lead.js';      // ✅ Add .js extension
 import dotenv from 'dotenv';
 
 dotenv.config();
