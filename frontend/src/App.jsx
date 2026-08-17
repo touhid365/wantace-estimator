@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import EstimatorFlow from './components/estimator/EstimatorFlow';
 import AdminPanel from './components/admin/AdminPanel';
 import AdminLogin from './components/admin/AdminLogin';
 
-function App() {
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const auth = localStorage.getItem('adminAuth') === 'true';
@@ -22,21 +23,29 @@ function App() {
     );
   }
 
+  console.log('Current path:', location.pathname);
+
   return (
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<EstimatorFlow />} />
-        <Route path="/estimator" element={<EstimatorFlow />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route 
-          path="/admin" 
-          element={
-            isAuthenticated ? <AdminPanel /> : <Navigate to="/admin/login" />
-          } 
-        />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </HashRouter>
+    <Routes>
+      <Route path="/" element={<EstimatorFlow />} />
+      <Route path="/estimator" element={<EstimatorFlow />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route 
+        path="/admin" 
+        element={
+          isAuthenticated ? <AdminPanel /> : <Navigate to="/admin/login" />
+        } 
+      />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 
