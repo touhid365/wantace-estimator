@@ -30,5 +30,9 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom']
+  },
+  preview: {
+    port: 4173,
+    host: true
   }
 })
