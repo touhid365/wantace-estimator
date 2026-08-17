@@ -2,10 +2,10 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import configRoutes from './routes/config.js';
-import estimateRoutes from './routes/estimate.js';
-import adminRoutes from './routes/admin.js';
-import { seedDatabase } from './seed/seedData.js';
+import configRoutes from './routes/config.js';      // ✅ Add .js
+import estimateRoutes from './routes/estimate.js';  // ✅ Add .js
+import adminRoutes from './routes/admin.js';        // ✅ Add .js
+import { seedDatabase } from './seed/seedData.js';  // ✅ Add .js
 
 // Load environment variables
 dotenv.config();
