@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import EstimatorFlow from './components/estimator/EstimatorFlow';
 import AdminPanel from './components/admin/AdminPanel';
 import AdminLogin from './components/admin/AdminLogin';
@@ -23,7 +23,7 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<EstimatorFlow />} />
         <Route path="/estimator" element={<EstimatorFlow />} />
@@ -34,15 +34,9 @@ function App() {
             isAuthenticated ? <AdminPanel /> : <Navigate to="/admin/login" />
           } 
         />
-        <Route 
-          path="/admin/*" 
-          element={
-            isAuthenticated ? <AdminPanel /> : <Navigate to="/admin/login" />
-          } 
-        />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
