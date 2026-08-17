@@ -17,15 +17,31 @@ export default function AdminPanel() {
   const loadData = async () => {
     try {
       setLoading(true);
+      setMessage(null);
+      
+      console.log('📡 Loading admin data...');
+      
+      // Load config and leads in parallel
       const [configData, leadsData] = await Promise.all([
         getConfig(),
         getLeads()
       ]);
+      
+      console.log('✅ Config loaded:', configData);
+      console.log('✅ Leads loaded:', leadsData);
+      
       setConfig(configData);
       setLeads(leadsData.leads || []);
+      
     } catch (err) {
-      if (err.message.includes('401')) {
-        navigate('/admin/login');
+      console.error('❌ Load data error:', err);
+      
+      if (err.message.includes('401') || err.message.includes('Unauthorized')) {
+        setMessage({ type: 'error', text: 'Session expired. Please login again.' });
+        setTimeout(() => {
+          localStorage.removeItem('adminAuth');
+          navigate('/admin/login');
+        }, 2000);
       } else {
         setMessage({ type: 'error', text: 'Failed to load data: ' + err.message });
       }
@@ -42,13 +58,23 @@ export default function AdminPanel() {
     setSaving(true);
     setMessage(null);
     try {
-      await updateConfig(updatedConfig);
+      console.log('📡 Saving config...');
+      const result = await updateConfig(updatedConfig);
+      console.log('✅ Config saved:', result);
+      
       setConfig(updatedConfig);
-      setMessage({ type: 'success', text: 'Configuration saved successfully! Version ' + (updatedConfig.config_version + 1) });
-      setTimeout(() => setMessage(null), 5000);
+      setMessage({ 
+        type: 'success', 
+        text: `Configuration saved successfully! Version ${result.config_version || 'updated'}` 
+      });
+      
       // Reload to get updated config
-      await loadData();
+      setTimeout(() => {
+        loadData();
+      }, 1000);
+      
     } catch (err) {
+      console.error('❌ Save error:', err);
       setMessage({ type: 'error', text: 'Failed to save: ' + err.message });
     } finally {
       setSaving(false);
@@ -62,8 +88,8 @@ export default function AdminPanel() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner message="Loading panel..." />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner message="Loading admin panel..." />
       </div>
     );
   }
@@ -72,11 +98,12 @@ export default function AdminPanel() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Owner Panel</h1>
             <p className="text-sm text-gray-500 mt-1">
-              Version {config?.config_version || 1} · Last updated {new Date(config?.updatedAt || Date.now()).toLocaleDateString()}
+              Version {config?.config_version || 1} 
+              {config?.updatedAt && ` · Updated ${new Date(config.updatedAt).toLocaleDateString()}`}
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -109,10 +136,10 @@ export default function AdminPanel() {
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="border-b border-gray-200">
-            <nav className="flex -mb-px">
+            <nav className="flex -mb-px overflow-x-auto">
               <button
                 onClick={() => setActiveTab('config')}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition ${
+                className={`px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap transition ${
                   activeTab === 'config'
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -122,7 +149,7 @@ export default function AdminPanel() {
               </button>
               <button
                 onClick={() => setActiveTab('leads')}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition ${
+                className={`px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap transition ${
                   activeTab === 'leads'
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
