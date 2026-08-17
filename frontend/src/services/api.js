@@ -1,10 +1,15 @@
-// Make sure this points to the correct API endpoint
 const API_URL = import.meta.env.VITE_API_URL || 'https://wantace-estimator-txka.onrender.com/api';
 
-// Public endpoints - all should include /api prefix
+// Helper to get auth header
+const getAuthHeader = () => {
+  const credentials = btoa('admin:roofing2026!');
+  return `Basic ${credentials}`;
+};
+
+// Public endpoints
 export const getConfig = async () => {
   try {
-    // ✅ Correct: /api/config
+    console.log('📡 Fetching config from:', `${API_URL}/config`);
     const response = await fetch(`${API_URL}/config`, {
       method: 'GET',
       headers: {
@@ -14,19 +19,22 @@ export const getConfig = async () => {
     });
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Config error response:', errorText);
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
-    return response.json();
+    const data = await response.json();
+    console.log('✅ Config loaded successfully');
+    return data;
   } catch (error) {
-    console.error('getConfig error:', error);
+    console.error('❌ getConfig error:', error);
     throw error;
   }
 };
 
 export const submitEstimate = async (data) => {
   try {
-    // ✅ Correct: /api/estimate
     const response = await fetch(`${API_URL}/estimate`, {
       method: 'POST',
       headers: {
@@ -48,10 +56,12 @@ export const submitEstimate = async (data) => {
   }
 };
 
+// Admin endpoints (protected)
 export const getLeads = async () => {
   try {
-    // ✅ Correct: /api/admin/leads
+    console.log('📡 Fetching leads from:', `${API_URL}/admin/leads`);
     const response = await fetch(`${API_URL}/admin/leads`, {
+      method: 'GET',
       headers: {
         'Authorization': getAuthHeader(),
         'Content-Type': 'application/json',
@@ -60,19 +70,24 @@ export const getLeads = async () => {
     });
     
     if (!response.ok) {
-      throw new Error('Failed to fetch leads');
+      if (response.status === 401) {
+        throw new Error('Unauthorized - Please login again');
+      }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
-    return response.json();
+    const data = await response.json();
+    console.log('✅ Leads loaded:', data);
+    return data;
   } catch (error) {
-    console.error('getLeads error:', error);
+    console.error('❌ getLeads error:', error);
     throw error;
   }
 };
 
 export const updateConfig = async (config) => {
   try {
-    // ✅ Correct: /api/admin/config
+    console.log('📡 Updating config...');
     const response = await fetch(`${API_URL}/admin/config`, {
       method: 'PUT',
       headers: {
@@ -84,19 +99,18 @@ export const updateConfig = async (config) => {
     });
     
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Unauthorized - Please login again');
+      }
       const error = await response.json();
       throw new Error(error.error || 'Failed to update configuration');
     }
     
-    return response.json();
+    const data = await response.json();
+    console.log('✅ Config updated:', data);
+    return data;
   } catch (error) {
-    console.error('updateConfig error:', error);
+    console.error('❌ updateConfig error:', error);
     throw error;
   }
-};
-
-// Helper function for auth header
-const getAuthHeader = () => {
-  const credentials = btoa('admin:roofing2026!');
-  return `Basic ${credentials}`;
 };
