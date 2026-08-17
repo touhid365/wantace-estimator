@@ -9,27 +9,44 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check if user is authenticated
     const auth = localStorage.getItem('adminAuth') === 'true';
     setIsAuthenticated(auth);
     setLoading(false);
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
   }
 
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<EstimatorFlow />} />
         <Route path="/estimator" element={<EstimatorFlow />} />
+        
+        {/* Admin routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route 
           path="/admin" 
           element={
             isAuthenticated ? <AdminPanel /> : <Navigate to="/admin/login" />
           } 
         />
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route 
+          path="/admin/*" 
+          element={
+            isAuthenticated ? <AdminPanel /> : <Navigate to="/admin/login" />
+          } 
+        />
+        
+        {/* 404 fallback */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );
