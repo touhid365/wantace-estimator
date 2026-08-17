@@ -9,7 +9,6 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is authenticated
     const auth = localStorage.getItem('adminAuth') === 'true';
     setIsAuthenticated(auth);
     setLoading(false);
@@ -26,11 +25,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
         <Route path="/" element={<EstimatorFlow />} />
         <Route path="/estimator" element={<EstimatorFlow />} />
-        
-        {/* Admin routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route 
           path="/admin" 
@@ -44,8 +40,6 @@ function App() {
             isAuthenticated ? <AdminPanel /> : <Navigate to="/admin/login" />
           } 
         />
-        
-        {/* 404 fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
